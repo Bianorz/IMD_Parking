@@ -128,6 +128,8 @@ void mostrarMapeamento(String nomeImagem, Vaga vaga[], int nVagas){
 		for (int i = 0; i < 4; i++)
 			line(imagem, vertices[i], vertices[(i + 1) % 4], Scalar(0, 255, 0));
 	}
+
+
 	imshow("mapa", imagem);
 	waitKey(0);
 }
