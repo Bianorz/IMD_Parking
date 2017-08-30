@@ -48,8 +48,8 @@ void salvarLocalVagas(String nomeImagem, int nVagas, String nomeArqTxt){
 	int fim = 0;
 	const string nomeJanela = "Interface de Marca��o";
 	namedWindow(nomeJanela, 0);
-	createTrackbar("centro_x", nomeJanela, &centro_x, 1000, apenasParaCompletarParametros);
-	createTrackbar("centro_y", nomeJanela, &centro_y, 1000, apenasParaCompletarParametros);
+	createTrackbar("horizontal", nomeJanela, &centro_x, 1000, apenasParaCompletarParametros);
+	createTrackbar("vertical", nomeJanela, &centro_y, 1000, apenasParaCompletarParametros);
 	createTrackbar("largura", nomeJanela, &largura, 1000, apenasParaCompletarParametros);
 	createTrackbar("altura", nomeJanela, &altura, 1000, apenasParaCompletarParametros);
 	createTrackbar("inclinacao", nomeJanela, &inclinacao, 1000, apenasParaCompletarParametros);
@@ -115,8 +115,12 @@ void carregarParametros(String nomeArqTxt, Vaga vaga[], int nVagas){
 	file.close();
 	}
 
-void mostrarMapeamento(Mat imagem, Vaga vaga[], int nVagas){
-	
+void mostrarMapeamento(String nomeImagem, Vaga vaga[], int nVagas){
+	Mat imagem = imread(nomeImagem, 1);
+	if (!imagem.data){
+		cout << "ERRO - ARQUIVO NAO ENCONTRADO" << endl;
+		system("pause");
+	}
 	for (int i = 0; i < nVagas; i++){
 		RotatedRect rRect = RotatedRect(Point2f(vaga[i].posicao.x, vaga[i].posicao.y), Size2f(vaga[i].largura, vaga[i].altura), vaga[i].inclinacao);
 		Point2f vertices[4];
@@ -125,7 +129,7 @@ void mostrarMapeamento(Mat imagem, Vaga vaga[], int nVagas){
 			line(imagem, vertices[i], vertices[(i + 1) % 4], Scalar(0, 255, 0));
 	}
 	imshow("mapa", imagem);
-	//waitKey(0);
+	waitKey(0);
 }
 
 int numeroContornos(Mat imagem){
