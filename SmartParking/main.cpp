@@ -17,11 +17,14 @@ int main(int argc, char** argv) {
 	Mat mapa = imread(pathMap, 1);
 	Point2f posicao;
 	int inclinacao;
-	for (int i = 0; i <= nVagas; i++) {
+	int nContorno = 0;
+	for (int i = 0; i < nVagas; i++) {
 		posicao = posVaga[i].posicao;
 		inclinacao = posVaga[1].inclinacao;
 		vaga[i] = pegarImagemCortada(mapa, posicao,
 		Size2f(posVaga[i].largura, posVaga[i].altura), inclinacao);
+		nContorno = numeroContornos(vaga[i]);
+		cout << "contornos encontrados: " << nContorno <<" vaga: " <<i+1<<endl;
 	}
 
 }
