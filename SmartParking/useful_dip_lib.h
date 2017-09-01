@@ -115,8 +115,8 @@ void carregarParametros(String nomeArqTxt, Vaga vaga[], int nVagas){
 	file.close();
 	}
 
-void mostrarMapeamento(String nomeImagem, Vaga vaga[], int nVagas){
-	Mat imagem = imread(nomeImagem, 1);
+void mostrarMapeamento(Mat imagem, Vaga vaga[], int nVagas){
+	//Mat imagem = imread(nomeImagem, 1);
 	if (!imagem.data){
 		cout << "ERRO - ARQUIVO NAO ENCONTRADO" << endl;
 		system("pause");
@@ -130,8 +130,8 @@ void mostrarMapeamento(String nomeImagem, Vaga vaga[], int nVagas){
 	}
 
 
-	imshow("mapa", imagem);
-	waitKey(0);
+	//imshow("mapa", imagem);
+	waitKey(15);
 }
 
 int numeroContornos(Mat imagem){
