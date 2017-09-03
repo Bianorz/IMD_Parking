@@ -16,6 +16,7 @@ int main(int argc, char** argv) {
 	//mostrarMapeamento(pathMap, posVaga,nVagas);
 	Mat mapa = imread(pathMap, 1);
 	Mat src;
+	int aaa = 5;
 	Point2f posicao;
 	int inclinacao;
 	int nContorno = 0;
