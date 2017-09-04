@@ -154,3 +154,27 @@ float mediaArray(float vetor[], int buff){
 	return media;
 }
 
+Mat histCalc(Mat image, int hsize){
+	Mat hist;
+	int histSize = hsize;  // número de cores do meu histograma
+	float range[] = { 0, hsize }; // range de cores
+	const float* histRange = { range }; // variavel do histograma
+	calcHist(&image, 1, 0, Mat(), hist, 1, &histSize, &histRange); // cálculo o histograma de cada vaga e salvo em backHist
+	return hist;
+}
+
+void plotHist(Mat hist, int histSize){
+	int hist_w = 640; int hist_h = 480;
+	int bin_w = cvRound((double)hist_w / histSize);
+	Mat histImage(hist_h, hist_w, CV_8UC3, Scalar(0, 0, 0));
+	normalize(hist, hist, 0, histImage.rows, NORM_MINMAX, -1, Mat());
+	for (int i = 1; i < histSize; i++)
+	{
+		line(histImage, Point(bin_w*(i - 1), hist_h - cvRound(hist.at<float>(i - 1))),
+			Point(bin_w*(i), hist_h - cvRound(hist.at<float>(i))),
+			Scalar(255, 255, 255), 2, 8, 0);
+	}
+	namedWindow("Histograma", CV_WINDOW_NORMAL);
+	imshow("Histograma", histImage);
+	waitKey(0);
+}
