@@ -33,7 +33,7 @@ int main(int argc, char** argv) {
 	vector<Mat> channels;
 	Point2f posicao;
 	int inclinacao;
-	int correlacao_cinza[nVagas], correlacao_h[nVagas];
+	float correlacao_cinza[nVagas], correlacao_h[nVagas];
 	int nContorno_mapa[nVagas];
 	int nContorno[nVagas];
 	for (int i = 0; i < nVagas; i++) {
