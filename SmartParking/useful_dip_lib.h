@@ -7,6 +7,31 @@
 using namespace cv;
 using namespace std;
 
+
+int haarCascade(){
+	Mat parkingFull = imread("images/mapa.png", 1);
+	Mat parkingEmpty = imread("images/mapa_vazio.png", 1);
+	if (!parkingFull.data || !parkingEmpty.data) {
+		cout << "images not found" << endl;
+		return -1;
+	}
+	Mat mFrame, mGray;
+	CascadeClassifier classifier;
+	vector<Rect> vFound;
+	classifier.load("cars3.xml");
+	//https://github.com/ozcanovunc/opencv-samples/blob/master/vehicle-detection-haar/cars3.xml
+
+
+
+	return 0;
+}
+
+
+
+
+
+
+
 Mat pegarImagemCortada(Mat src, Point2f centro, Size2f tamanho, int angulo){
 	Mat imagemCortada;
 	Size tamImagemOriginal = src.size();

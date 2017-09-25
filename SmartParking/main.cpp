@@ -6,6 +6,13 @@ using namespace cv;
 using namespace std;
 
 int main(int argc, char** argv) {
+
+	int haar = haarCascade();
+	cout << haar << endl;
+
+
+
+
 	// SETUP STEP: Load an image to use for parking slot definition and set parking spaces
 	const int nVagas = 14;
 	String slotDatabase = "slotDatabase.txt";
