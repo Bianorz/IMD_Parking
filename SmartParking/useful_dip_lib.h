@@ -25,7 +25,7 @@ int haarCascade() {
 	Mat src,gray;
 	VideoCapture capture;
 	while (1) {
-		//capture.open("26-Set-11_30.mp4");
+		capture.open("images/26-Set-15_15.mp4");
 		if (!capture.isOpened()) {
 			cout << "ERRO, VIDEO NAO ENCONTRADO\n";
 			getchar();
