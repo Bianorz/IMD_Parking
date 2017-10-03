@@ -18,14 +18,15 @@ int main(int argc, char** argv) {
 	Mat vaga[nVagas], histograma_h[nVagas];
 	//salvarLocalVagas(pathMap,nVagas,slotDatabase);
 	carregarParametros(slotDatabase, posVaga, nVagas);
-	//mostrarMapeamento(pathMap, posVaga,nVagas);
 	Mat mapa = imread(pathMap, 1);
+	//mostrarMapeamento(mapa, posVaga,nVagas);
+
 	// variavel para salvar os resultados
 	ofstream contorno; // variavel para auxilio da gravação de dados
-	contorno.open("c_26-Set-05_15.csv"); // abrindo arquivo onde os dados serão salvos
+	contorno.open("c27-Set.csv"); // abrindo arquivo onde os dados serão salvos
 
 	ofstream hist_hue; // variavel para auxilio da gravação de dados
-	hist_hue.open("h_26-Set-05_15.csv"); // abrindo arquivo onde os dados serão salvos
+	hist_hue.open("h27-Set.csv"); // abrindo arquivo onde os dados serão salvos
 
 	Mat src;
 	Mat cinza, hsv;
@@ -50,7 +51,7 @@ int main(int argc, char** argv) {
 
 	VideoCapture capture;
 	while (1) {
-		capture.open("/home/bianor/Dropbox/gravs/26-Set-05_15.mp4");
+		capture.open("images/27_Set.mp4");
 		if (!capture.isOpened()) {
 			cout << "ERRO, VIDEO NAO ENCONTRADO\n";
 			getchar();
@@ -86,9 +87,10 @@ int main(int argc, char** argv) {
 		contorno.close();
 		hist_hue.close();
 		capture.release();
+		cout << "PAROU";
 		imshow("vaga", vaga[5]);
 		waitKey(0);
-		cout << "PAROU";
+
 	}
 
 }

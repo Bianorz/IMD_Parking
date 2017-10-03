@@ -141,6 +141,8 @@ void salvarLocalVagas(String nomeImagem, int nVagas, String nomeArqTxt) {
 	}
 	cout << "Marca��o concluida com sucesso, valores determinados salvos em "
 			<< nomeArqTxt << endl;
+	imshow("rectangles", imagem);
+	waitKey(0);
 	system("pause");
 
 }
