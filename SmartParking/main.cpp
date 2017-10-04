@@ -1,12 +1,36 @@
+// Universidade Federal do Rio Grande do Norte
+// Disciplina: Trabalho de Conclusão de Curso II
+// Período: 2017.1
+// Aluno: Bianor Neto ~ 10.bianor@gmail.com
+// Prof. Orientador: José Alberto Nicolau
+// Projeto: Estimação da distância entre câmera e objeto de cor conhecida, versão processamento de imagem de uma webcam
 #include "opencv2/opencv.hpp"
 #include "useful_dip_lib.h"
 #include <fstream>
 #include <iostream>
+#include <opencv2/core/core.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 using namespace cv;
 using namespace std;
 
-int main(int argc, char** argv) {
+void Whtml(float a) {
 
+	ofstream myfile;
+	myfile.open("vagas.html");
+
+	myfile << "<!DOCTYPE html>\n<html>\n<head>\n<h1>Smart Parking</h1>\n";
+	myfile << "<meta http-equiv=\"refresh\" content=\"1\" />\n</head>\n<body>\n";
+	myfile << "vagas livres =  " << a << "\n";
+	myfile << "<h2>Mapa de Vagas</h2>\n";
+	myfile << "<img src=\"alpha.png\" alt=\"\" style=\"width:304px;height:228px;\">\n";
+	myfile << "</body>\n</html>";
+	myfile.close();
+
+
+}
+
+int main() {
 	//int haar = haarCascade();
 	//cout << haar << endl;
 	// SETUP STEP: Load an image to use for parking slot definition and set parking spaces
@@ -16,81 +40,101 @@ int main(int argc, char** argv) {
 	Vaga posVaga[nVagas]; // posições de cada vaga, centro, largura, altura e inclinação
 	Mat vaga_mapa[nVagas], histograma_mapa_h[nVagas];
 	Mat vaga[nVagas], histograma_h[nVagas];
-	//salvarLocalVagas(pathMap,nVagas,slotDatabase);
 	carregarParametros(slotDatabase, posVaga, nVagas);
 	Mat mapa = imread(pathMap, 1);
-	//mostrarMapeamento(mapa, posVaga,nVagas);
-
-	// variavel para salvar os resultados
-	ofstream contorno; // variavel para auxilio da gravação de dados
-	contorno.open("c27-Set.csv"); // abrindo arquivo onde os dados serão salvos
-
-	ofstream hist_hue; // variavel para auxilio da gravação de dados
-	hist_hue.open("h27-Set.csv"); // abrindo arquivo onde os dados serão salvos
-
 	Mat src;
-	Mat cinza, hsv;
+	Mat cinza, desenho, hsv;
 	vector<Mat> channels;
 	Point2f posicao;
+
+	float limiarUp = 0.30;
+	float limiarDown = 0.4;
+
 	int inclinacao;
-	float correlacao_cinza[nVagas], correlacao_h[nVagas];
-	int nContorno_mapa[nVagas];
-	int nContorno[nVagas];
+	float correlacao_h[nVagas];
 	for (int i = 0; i < nVagas; i++) {
 		posicao = posVaga[i].posicao;
 		inclinacao = posVaga[i].inclinacao;
 		vaga_mapa[i] = pegarImagemCortada(mapa, posicao,
 				Size2f(posVaga[i].largura, posVaga[i].altura), inclinacao);
-		// numero de contornos de cada vaga do estacionamento vazio (EV)
-		nContorno_mapa[i] = numeroContornos(vaga_mapa[i]);
+
 		// histograma de cada vaga apenas do Hue do EV
 		cvtColor(vaga_mapa[i], hsv, COLOR_BGR2HSV);
 		split(hsv, channels); // separei os canais H, S e V
 		histograma_mapa_h[i] = histCalc(channels[0], 180);
 	}
 
-	VideoCapture capture;
-	while (1) {
-		capture.open("images/27_Set.mp4");
-		if (!capture.isOpened()) {
-			cout << "ERRO, VIDEO NAO ENCONTRADO\n";
-			getchar();
-			return -1;
-		}
-		while (capture.get(CV_CAP_PROP_POS_FRAMES) < capture.get(
-				CV_CAP_PROP_FRAME_COUNT) - 1) {
-			capture.read(src);
-			// loop para processar as 14 vagas
 
-			for (int i = 0; i < nVagas; i++) {
-				posicao = posVaga[i].posicao;
-				inclinacao = posVaga[i].inclinacao;
-				vaga[i] = pegarImagemCortada(src, posicao,
-						Size2f(posVaga[i].largura, posVaga[i].altura),
-						inclinacao);
-				// numero de contornos de cada vaga do estacionamento vazio (EV)
-				nContorno[i] = numeroContornos(vaga[i]);
-				contorno << nContorno[i] << " ";
-				// histograma de cada vaga apenas do Hue do EV
-				cvtColor(vaga[i], hsv, COLOR_BGR2HSV);
-				split(hsv, channels); // separei os canais H, S e V
-				histograma_h[i] = histCalc(channels[0], 180);
-				// comparacao entre histogramas hue
-				correlacao_h[i] = compareHist(histograma_mapa_h[i],
-						histograma_h[i], HISTCMP_CORREL);
-				hist_hue << correlacao_h[i] << " ";
+	/*
+	 If para verificação se existe camera conectada ao sistema
+	 */
+    VideoCapture capture; //
+
+    capture.open("http://10.7.161.98:10088/?action=stream");
+    if (!capture.isOpened())  // if not success, exit program
+    {
+        cout << "Cannot open the video cam" << endl;
+        return -1;
+    }
+	//********************LOOP INFINITO PARA PROCESSAMENTO DA IMAGEM**********************
+	int ocupacao = 0;
+	int totalVagas =0;
+	int aux = 0;
+	int atual = 0;
+    while (1) {
+		capture.read(src);
+		src.copyTo(desenho);
+		ocupacao = 0;
+		// loop para processar as 14 vagas
+		for (int i = 0; i < nVagas; i++) {
+			posicao = posVaga[i].posicao;
+			inclinacao = posVaga[i].inclinacao;
+			vaga[i] = pegarImagemCortada(src, posicao,
+					Size2f(posVaga[i].largura, posVaga[i].altura), inclinacao);
+			// histograma de cada vaga apenas do Hue do EV
+			Rect a(posicao.x-posVaga[i].largura/2,posicao.y-posVaga[i].altura/2,posVaga[i].largura,posVaga[i].altura);
+			cvtColor(vaga[i], hsv, COLOR_BGR2HSV);
+			split(hsv, channels); // separei os canais H, S e V
+			histograma_h[i] = histCalc(channels[0], 180);
+			// comparacao entre histogramas hue
+			correlacao_h[i] = compareHist(histograma_mapa_h[i],
+					histograma_h[i], HISTCMP_CORREL);
+			//cout << "correlacao= " << correlacao_h[i] << " | vaga= " << i+1 << "pos: " << posicao << endl;
+
+			if (i == 1) {
+				//cout << "correlacao= " << correlacao_h[i] << endl;
+			}
+			if (i <= 5){
+				if (correlacao_h[i] > limiarUp) {
+					rectangle(desenho,a,Scalar(0, 255, 0), 2);
+
+				} else {
+					rectangle(desenho,a,Scalar(0, 0, 255), 2);
+					ocupacao++;
+				}
+			} else {
+				if (correlacao_h[i] > limiarDown) {
+					rectangle(desenho,a,Scalar(0, 255, 0), 2);
+
+				} else {
+					rectangle(desenho,a,Scalar(0, 0, 255), 2);
+					ocupacao++;
+				}
 
 			}
-			contorno << "\n";
-			hist_hue << "\n";
+
 		}
-		contorno.close();
-		hist_hue.close();
-		capture.release();
-		cout << "PAROU";
-		imshow("vaga", vaga[5]);
-		waitKey(0);
+		totalVagas = nVagas - ocupacao;
+		namedWindow("Final Result", WINDOW_NORMAL);
+		imshow("Final Result", desenho);
+		waitKey(15);
+		/*if (totalVagas != atual || aux == 0){
+			imwrite("alpha.png", desenho);
+			atual = totalVagas;
+			aux = 1;
+			Whtml(totalVagas);
+		}*/
 
 	}
-
+	return 0;
 }
