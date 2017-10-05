@@ -76,18 +76,22 @@ int main() {
 		split(hsv, channels); // separei os canais H, S e V
 		histograma_mapa_h[i] = histCalc(channels[0], 180);
 	}
+	VideoCapture capture(0); // open the default camera
+	if (!capture.isOpened()) { // check if we succeeded
+		cout << "deu ruim";
+		return -1;
+	}
 
-	/*
-	 If para verificação se existe camera conectada ao sistema
-	 */
-	VideoCapture capture; //
+
+
+	/*VideoCapture capture; //
 
 	capture.open("http://10.7.161.98:10088/?action=stream");
 	if (!capture.isOpened())  // if not success, exit program
 	{
 		cout << "Cannot open the video cam" << endl;
 		return -1;
-	}
+	}*/
 	//********************LOOP INFINITO PARA PROCESSAMENTO DA IMAGEM**********************
 	int ocupacao = 0;
 	int totalVagas = 0;
