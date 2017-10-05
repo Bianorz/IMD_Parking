@@ -200,5 +200,7 @@ int main() {
 	return 0;
 }
 
+-----------------------------------------------
 
+tempo rodar linux pc = Time elapsed: 0.016712 sec
 
