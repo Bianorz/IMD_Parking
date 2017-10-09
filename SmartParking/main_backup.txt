@@ -203,4 +203,5 @@ int main() {
 -----------------------------------------------
 
 tempo rodar linux pc = Time elapsed: 0.016712 sec
+rasp = 0.36 sec
 

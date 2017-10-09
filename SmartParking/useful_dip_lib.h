@@ -25,7 +25,7 @@ int haarCascade() {
 	Mat src,gray;
 	VideoCapture capture;
 	while (1) {
-		capture.open("images/26-Set-15_15.mp4");
+		capture.open("/home/bianor/Dropbox/gravs/28-Set-16_15.mp4");
 		if (!capture.isOpened()) {
 			cout << "ERRO, VIDEO NAO ENCONTRADO\n";
 			getchar();
@@ -184,12 +184,13 @@ void mostrarMapeamento(Mat imagem, Vaga vaga[], int nVagas) {
 	waitKey(15);
 }
 
-int numeroContornos(Mat imagem) {
+int numeroContornos(Mat imagem, double lowerThresh) {
 	vector<vector<Point> > contours;
+	//int lowerThresh = 5;
 	vector<Vec4i> hierarchy;
 	Mat imagemBorrada, bordas;
 	GaussianBlur(imagem, imagemBorrada, Size(5, 5), 0, 0);
-	Canny(imagemBorrada, bordas, 35, 125);
+	Canny(imagemBorrada, bordas, lowerThresh, 3*lowerThresh);
 	findContours(bordas, contours, hierarchy, CV_RETR_CCOMP,
 			CV_CHAIN_APPROX_SIMPLE);
 	int numeroBordas = hierarchy.size();
