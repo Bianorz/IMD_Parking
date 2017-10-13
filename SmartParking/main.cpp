@@ -45,14 +45,14 @@ int main() {
 	vector<Mat> channels;
 	Point2f posicao;
 
-	String videoPath = "/home/bianor/Dropbox/gravs/04-Out-11_15.mp4";
+	String videoPath = "/home/bianor/Videos/26_horas.mp4";
 
 	ofstream fileContour; // variavel para auxilio da gravação de dados
-	string fullpathContour = (videoPath.c_str() + string("_contour.csv"));
+	string fullpathContour = (videoPath.c_str() + string("_contour_200.csv"));
 	fileContour.open(fullpathContour.c_str()); // abrindo arquivo onde os dados serão salvos
 
 	ofstream fileHue; // variavel para auxilio da gravação de dados
-	string fullpathHue = (videoPath.c_str() + string("_hue.csv"));
+	string fullpathHue = (videoPath.c_str() + string("_hue_200.csv"));
 	fileHue.open(fullpathHue.c_str()); // abrindo arquivo onde os dados serão salvos
 
 	float limiarUpCorrelation = 0.30;
@@ -61,7 +61,7 @@ int main() {
 	float limiarUpCanny = 5.33;
 	float limiarDownCanny = 3.88;
 
-	float limiarUpContornos = 250;
+	float limiarUpContornos = 200;
 	float limiarDownContornos = 80;
 
 	int inclinacao;
@@ -82,7 +82,7 @@ int main() {
 	 */
 	VideoCapture capture; //
 	while (1) {
-		capture.open("images/27_Set.mp4");
+		capture.open(videoPath.c_str());
 		if (!capture.isOpened()) {
 			cout << "ERRO, VIDEO NAO ENCONTRADO\n";
 			getchar();
