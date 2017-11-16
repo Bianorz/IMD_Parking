@@ -84,20 +84,21 @@ void salvarLocalVagas(String nomeImagem, int nVagas, String nomeArqTxt) {
 	int altura = 1;
 	int inclinacao = 0;
 	int fim = 0;
-	const string nomeJanela = "Interface de Marca��o";
+	const string nomeJanela = "Parking Spot Positioning";
 	namedWindow(nomeJanela, 0);
-	createTrackbar("horizontal", nomeJanela, &centro_x, 1000,
-			apenasParaCompletarParametros);
-	createTrackbar("vertical", nomeJanela, &centro_y, 1000,
-			apenasParaCompletarParametros);
-	createTrackbar("largura", nomeJanela, &largura, 1000,
-			apenasParaCompletarParametros);
-	createTrackbar("altura", nomeJanela, &altura, 1000,
-			apenasParaCompletarParametros);
-	createTrackbar("inclinacao", nomeJanela, &inclinacao, 1000,
-			apenasParaCompletarParametros);
-	createTrackbar("fim", nomeJanela, &fim, 1, apenasParaCompletarParametros);
+
 	Mat imagem = imread(nomeImagem, 1);
+	createTrackbar("x", nomeJanela, &centro_x, imagem.cols,
+			apenasParaCompletarParametros);
+	createTrackbar("y", nomeJanela, &centro_y, imagem.rows,
+			apenasParaCompletarParametros);
+	createTrackbar("height", nomeJanela, &largura, imagem.cols,
+			apenasParaCompletarParametros);
+	createTrackbar("width", nomeJanela, &altura, imagem.rows,
+			apenasParaCompletarParametros);
+	createTrackbar("tilt", nomeJanela, &inclinacao, 360,
+			apenasParaCompletarParametros);
+	createTrackbar("end", nomeJanela, &fim, 1, apenasParaCompletarParametros);
 	if (!imagem.data) {
 		cout << "ERRO - ARQUIVO NAO ENCONTRADO" << endl;
 		system("pause");
@@ -115,7 +116,7 @@ void salvarLocalVagas(String nomeImagem, int nVagas, String nomeArqTxt) {
 			rRect.points(vertices);
 			for (int i = 0; i < 4; i++)
 				line(imagem, vertices[i], vertices[(i + 1) % 4],
-						Scalar(0, 255, 0));
+						Scalar(0, 255, 0),3);
 
 			imshow("rectangles", imagem);
 			waitKey(15);
@@ -177,11 +178,11 @@ void mostrarMapeamento(Mat imagem, Vaga vaga[], int nVagas) {
 		Point2f vertices[4];
 		rRect.points(vertices);
 		for (int i = 0; i < 4; i++)
-			line(imagem, vertices[i], vertices[(i + 1) % 4], Scalar(0, 255, 0));
+			line(imagem, vertices[i], vertices[(i + 1) % 4], Scalar(0, 255, 0),3);
 	}
 
-	//imshow("mapa", imagem);
-	waitKey(15);
+	imshow("mapa", imagem);
+	waitKey(0);
 }
 
 int numeroContornos(Mat imagem, double lowerThresh) {
@@ -232,3 +233,18 @@ void plotHist(Mat hist, int histSize) {
 	imshow("Histograma", histImage);
 	waitKey(0);
 }
+
+
+Mat get_hue_channel(Mat src){
+	Mat hsv;
+	vector<Mat> channels;
+	cvtColor(src, hsv, COLOR_BGR2HSV);
+	split(hsv, channels); // separei os canais H, S e V
+	return channels[0];
+}
+
+int get_contour(Mat src){
+
+}
+
+

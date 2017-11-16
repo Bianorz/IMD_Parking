@@ -25,147 +25,45 @@ void toc() {
 			<< " sec" << std::endl;
 	tictoc_stack.pop();
 }
-
-// introducao/ trabalhos relacionados/ falar sobre o trabalho /conclusao trabalhos /imgs do feed/vagas nao sao respeitadas/exposicao a luminosidade/ motoristas nao respietam vagas,
 int main() {
-	//int haar = haarCascade();
-	//cout << haar << endl;
-	// SETUP STEP: Load an image to use for parking slot definition and set parking spaces
-	const int nVagas = 14;
-	String slotDatabase = "slotDatabase.txt";
-	String pathMap = "images/mapa_vazio.png";
-	Vaga posVaga[nVagas]; // posições de cada vaga, centro, largura, altura e inclinação
-	Mat vaga_mapa[nVagas], histograma_mapa_h[nVagas];
-	Mat vaga[nVagas], histograma_h[nVagas];
-	int nContorno[nVagas];
-	carregarParametros(slotDatabase, posVaga, nVagas);
-	Mat mapa = imread(pathMap, 1);
-	Mat src;
-	Mat cinza, desenho, hsv;
-	vector<Mat> channels;
-	Point2f posicao;
 
-	String videoPath = "/home/bianor/Videos/26_horas.mp4";
+	VideoCapture capture;
 
-	ofstream fileContour; // variavel para auxilio da gravação de dados
-	string fullpathContour = (videoPath.c_str() + string("_contour_200.csv"));
-	fileContour.open(fullpathContour.c_str()); // abrindo arquivo onde os dados serão salvos
+	Mat src,crop,mapa_vazio;
+	Mat hue,hue_vazio;
+	Mat histogramaHue,histogramaVazio;
 
-	ofstream fileHue; // variavel para auxilio da gravação de dados
-	string fullpathHue = (videoPath.c_str() + string("_hue_200.csv"));
-	fileHue.open(fullpathHue.c_str()); // abrindo arquivo onde os dados serão salvos
+	float correlacao = 0;
 
-	float limiarUpCorrelation = 0.30;
-	float limiarDownCorrelation = 0.4;
+	uint8_t teste = 8;
 
-	float limiarUpCanny = 5.33;
-	float limiarDownCanny = 3.88;
+	mapa_vazio = imread("images/mapa_vazio.png");
+	if (!mapa_vazio.data){
+		cout << "ERRO, imagem não encontrada\n";
+				return -1;
+	}
+	Mat corte = pegarImagemCortada(mapa_vazio,Point2f(659, 111),Size2f(77, 168),0);
+	hue_vazio = get_hue_channel(corte);
+	histogramaVazio = histCalc(hue_vazio, 180);
 
-	float limiarUpContornos = 200;
-	float limiarDownContornos = 80;
 
-	int inclinacao;
-	float correlacao_h[nVagas];
-	for (int i = 0; i < nVagas; i++) {
-		posicao = posVaga[i].posicao;
-		inclinacao = posVaga[i].inclinacao;
-		vaga_mapa[i] = pegarImagemCortada(mapa, posicao,
-				Size2f(posVaga[i].largura, posVaga[i].altura), inclinacao);
-		// histograma de cada vaga apenas do Hue do EV
-		cvtColor(vaga_mapa[i], hsv, COLOR_BGR2HSV);
-		split(hsv, channels); // separei os canais H, S e V
-		histograma_mapa_h[i] = histCalc(channels[0], 180);
+	capture.open("opa.mp4");
+
+	if (!capture.isOpened()) {
+		cout << "ERRO, VIDEO NAO ENCONTRADO\n";
+		return -1;
 	}
 
-	/*
-	 If para verificação se existe camera conectada ao sistema
-	 */
-	VideoCapture capture; //
-	while (1) {
-		capture.open(videoPath.c_str());
-		if (!capture.isOpened()) {
-			cout << "ERRO, VIDEO NAO ENCONTRADO\n";
-			getchar();
-			return -1;
-		}
-
-		//********************LOOP INFINITO PARA PROCESSAMENTO DA IMAGEM**********************
-
-		int aux = 0;
-
-		while (capture.get(CV_CAP_PROP_POS_FRAMES)
-				< capture.get(CV_CAP_PROP_FRAME_COUNT) - 1) {
-			if (aux == 0) {
-				tic();
-			}
-			capture.read(src);
-			src.copyTo(desenho);
-			// loop para processar as 14 vagas
-			for (int i = 0; i < nVagas; i++) {
-				posicao = posVaga[i].posicao;
-				inclinacao = posVaga[i].inclinacao;
-				vaga[i] = pegarImagemCortada(src, posicao,
-						Size2f(posVaga[i].largura, posVaga[i].altura),
-						inclinacao);
-				// histograma de cada vaga apenas do Hue do EV
-				Rect a(posicao.x - posVaga[i].largura / 2,
-						posicao.y - posVaga[i].altura / 2, posVaga[i].largura,
-						posVaga[i].altura);
-				cvtColor(vaga[i], hsv, COLOR_BGR2HSV);
-				split(hsv, channels); // separei os canais H, S e V
-				histograma_h[i] = histCalc(channels[0], 180);
-				// comparacao entre histogramas hue
-				correlacao_h[i] = compareHist(histograma_mapa_h[i],
-						histograma_h[i], HISTCMP_CORREL);
-
-				if (i <= 5) {
-					if (correlacao_h[i] > limiarUpCorrelation) {
-						fileHue << 0 << " ";
-						//rectangle(desenho,a,Scalar(0, 255, 0), 2);
-					} else {
-						//rectangle(desenho,a,Scalar(0, 0, 255), 2);
-						fileHue << 1 << " ";
-					}
-					nContorno[i] = numeroContornos(vaga[i], limiarUpCanny);
-					if (nContorno[i] > limiarUpContornos) {
-						fileContour << 0 << " ";
-					} else {
-						fileContour << 1 << " ";
-					}
-
-				} else {
-					if (correlacao_h[i] > limiarDownCorrelation) {
-						fileHue << 0 << " ";
-						//rectangle(desenho,a,Scalar(0, 255, 0), 2);
-
-					} else {
-						fileHue << 1 << " ";
-						//rectangle(desenho,a,Scalar(0, 0, 255), 2);
-					}
-					nContorno[i] = numeroContornos(vaga[i], limiarDownCanny);
-					if (nContorno[i] > limiarDownContornos) {
-						fileContour << 0 << " ";
-					} else {
-						fileContour << 1 << " ";
-					}
-				}
-			}
-			fileHue << "\n";
-			fileContour << "\n";
-
-			if (aux == 0) {
-				toc();
-				aux = 1;
-			}
-			/*namedWindow("Final Result", WINDOW_NORMAL);
-			 imshow("Final Result", desenho);
-			 waitKey(15);*/
-		}
-		capture.release();
-		fileHue.close();
-		fileContour.close();
-		cout << "finish" << endl;
-		return 0;
+	while (capture.get(CV_CAP_PROP_POS_FRAMES)
+					< capture.get(CV_CAP_PROP_FRAME_COUNT) - 1) {
+		capture.read(src);
+		crop = pegarImagemCortada(src,Point2f(659, 111),Size2f(77, 168),0);
+		hue = get_hue_channel(crop);
+		histogramaHue = histCalc(hue, 180);
+		correlacao = compareHist(histogramaVazio,
+					histogramaVazio, HISTCMP_CORREL);
 	}
+	cout << "finish" << endl;
+
 	return 0;
 }
