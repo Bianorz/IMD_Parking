@@ -205,3 +205,9 @@ int main() {
 tempo rodar linux pc = Time elapsed: 0.016712 sec
 rasp = 0.36 sec
 
+0,2 - 0,36
+0,11 - x
+
+0.113558
+0.09
+main_backup.txt

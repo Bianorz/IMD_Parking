@@ -6,6 +6,7 @@
 // Projeto: Estimação da distância entre câmera e objeto de cor conhecida, versão processamento de imagem de uma webcam
 #include "opencv2/opencv.hpp"
 #include "useful_dip_lib.h"
+#include "training.h"
 #include <fstream>
 #include <iostream>
 #include <ctime>
@@ -26,44 +27,15 @@ void toc() {
 	tictoc_stack.pop();
 }
 int main() {
-
-	VideoCapture capture;
-
-	Mat src,crop,mapa_vazio;
-	Mat hue,hue_vazio;
-	Mat histogramaHue,histogramaVazio;
-
-	float correlacao = 0;
-
-	uint8_t teste = 8;
-
-	mapa_vazio = imread("images/mapa_vazio.png");
-	if (!mapa_vazio.data){
-		cout << "ERRO, imagem não encontrada\n";
-				return -1;
-	}
-	Mat corte = pegarImagemCortada(mapa_vazio,Point2f(659, 111),Size2f(77, 168),0);
-	hue_vazio = get_hue_channel(corte);
-	histogramaVazio = histCalc(hue_vazio, 180);
-
-
-	capture.open("opa.mp4");
-
-	if (!capture.isOpened()) {
-		cout << "ERRO, VIDEO NAO ENCONTRADO\n";
-		return -1;
-	}
-
-	while (capture.get(CV_CAP_PROP_POS_FRAMES)
-					< capture.get(CV_CAP_PROP_FRAME_COUNT) - 1) {
-		capture.read(src);
-		crop = pegarImagemCortada(src,Point2f(659, 111),Size2f(77, 168),0);
-		hue = get_hue_channel(crop);
-		histogramaHue = histCalc(hue, 180);
-		correlacao = compareHist(histogramaVazio,
-					histogramaVazio, HISTCMP_CORREL);
-	}
-	cout << "finish" << endl;
-
+	/*string videoFolder = "videos_for_training/";
+	String trainDataFile = "trainData.csv";
+	String responsesFile = "responses.csv";
+	generate_database(videoFolder,trainDataFile,responsesFile);
+	*/
+	string videoFolder = "videos_for_testing/";
+	String testDataFile = "testData.csv";
+	String realValuesTestData = "realData.csv";
+	generate_database(videoFolder,testDataFile,realValuesTestData);
 	return 0;
+
 }

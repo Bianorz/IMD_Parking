@@ -3,6 +3,8 @@
 #include <iostream>
 #include <math.h>   
 #include <fstream>
+#include <sys/types.h>
+#include <dirent.h>
 
 using namespace cv;
 using namespace std;
@@ -47,10 +49,23 @@ int haarCascade() {
 	return 0;
 }
 
-Mat pegarImagemCortada(Mat src, Point2f centro, Size2f tamanho, int angulo) {
+Mat get_cropped_image(Mat src, Point2f center, Size2f size, int angulo) {
+	/*@brief
+	 * src: image that you want to crop
+	 * center: x,y center of the cropped image
+	 * size: size of the cropped image
+	 *  ________
+	 * |   ___	|
+	 * |  |x,y|	|
+	 * |  |___| |
+	 * |________|
+	 *
+	 *
+	 *
+	 * */
 	Mat imagemCortada;
 	Size tamImagemOriginal = src.size();
-	RotatedRect rRect = RotatedRect(centro, tamanho, angulo);
+	RotatedRect rRect = RotatedRect(center, size, angulo);
 	Point2f vertices[4];
 	rRect.points(vertices);
 	vector<Point> tri2CroppedInt;
@@ -185,19 +200,6 @@ void mostrarMapeamento(Mat imagem, Vaga vaga[], int nVagas) {
 	waitKey(0);
 }
 
-int numeroContornos(Mat imagem, double lowerThresh) {
-	vector<vector<Point> > contours;
-	//int lowerThresh = 5;
-	vector<Vec4i> hierarchy;
-	Mat imagemBorrada, bordas;
-	GaussianBlur(imagem, imagemBorrada, Size(5, 5), 0, 0);
-	Canny(imagemBorrada, bordas, lowerThresh, 3*lowerThresh);
-	findContours(bordas, contours, hierarchy, CV_RETR_CCOMP,
-			CV_CHAIN_APPROX_SIMPLE);
-	int numeroBordas = hierarchy.size();
-	return numeroBordas;
-}
-
 float mediaArray(float vetor[], int buff) {
 	float sum = 0, media = 0;
 	for (int i = 0; i < buff; i++) {
@@ -243,8 +245,52 @@ Mat get_hue_channel(Mat src){
 	return channels[0];
 }
 
-int get_contour(Mat src){
+int number_of_files_inside_folder(String folder_path) {
+	DIR *dp;
+	int i = 0;
+	struct dirent *ep;
+	dp = opendir(folder_path.c_str());
 
+	if (dp != NULL) {
+		while (ep = readdir(dp))
+			i++;
+
+		(void) closedir(dp);
+	} else
+		perror("Couldn't open the directory");
+	return (i - 2); // the fuction count the number of files + 2,
+	//I don't know why
+}
+
+string *get_fileList(string folder_path){
+    int n = number_of_files_inside_folder(folder_path.c_str());
+    cout << n << endl;
+    string *s = new string[n];
+    char NameArr[512][256];
+    DIR *dir;
+    int i=0,k;
+    struct dirent *ent;
+    dir = opendir (folder_path.c_str());
+    if (dir != NULL)
+    {
+    /* print all the files and directories within directory */
+    while ((ent = readdir (dir)) != NULL)
+        {
+        strcpy(NameArr[i],ent->d_name);
+        i++;
+        /* save filenames in the array */
+        }
+    closedir (dir);
+    }
+    else
+    {
+    /* could not open directory */
+    perror ("");
+    }
+    for (k=0;(k<(i+1)) && (k<n);k++){
+    	s[k]=NameArr[k];
+    }
+    return s;
 }
 
 
