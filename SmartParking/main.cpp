@@ -1,9 +1,3 @@
-// Universidade Federal do Rio Grande do Norte
-// Disciplina: Trabalho de Conclusão de Curso II
-// Período: 2017.1
-// Aluno: Bianor Neto ~ 10.bianor@gmail.com
-// Prof. Orientador: José Alberto Nicolau
-// Projeto: Estimação da distância entre câmera e objeto de cor conhecida, versão processamento de imagem de uma webcam
 #include "opencv2/opencv.hpp"
 #include "useful_dip_lib.h"
 #include "training.h"
