@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 // Universidade Federal do Rio Grande do Norte
 // Aluno: Bianor Neto ~ 10.bianor@gmail.com
+=======
+>>>>>>> 2ab47f2102cc746eccf61e08329a79bb0582f863
 #include "opencv2/opencv.hpp"
 #include "sup_pdi.h" // Funcoes de suporte de PDI
 
